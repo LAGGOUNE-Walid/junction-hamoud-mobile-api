@@ -1,0 +1,41 @@
+version: "3"
+networks:
+  junction:
+services:
+ nginx:
+  ports: 
+   - "82:80"
+  tty: true
+  image: nginx:latest
+  volumes:
+   - ./src:/var/www/html
+   - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+  networks:
+   - junction
+  environment:
+    TZ: Africa/Algiers
+ mariadbjunction:
+  container_name: mariadbjunction
+  tty: true
+  networks:
+   - junction
+  image: mariadb
+  ports: 
+   - "6306:3306"
+  volumes:
+   - ./mariadb:/var/lib/mysql
+  environment:
+   MYSQL_ROOT_PASSWORD: root
+   MYSQL_DATABASE: test
+   MYSQL_USER: root
+   MYSQL_PASSWORD: root
+ phpjunction:
+  build:
+   context: .
+   dockerfile: php/Dockerfile
+  networks:
+   - junction
+  volumes:
+   - ./src:/var/www/html
+  environment:
+    TZ: Africa/Algiers
